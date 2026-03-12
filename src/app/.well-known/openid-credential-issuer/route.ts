@@ -20,12 +20,27 @@ export async function GET() {
     credential_configurations_supported: {
       EventAttendanceCredential: {
         format: "vc+sd-jwt",
+        vct: `${issuerUrl}/credentials/EventAttendanceCredential`,
         scope: "EventAttendanceCredential",
         cryptographic_binding_methods_supported: ["jwk"],
         credential_signing_alg_values_supported: ["ES256"],
         proof_types_supported: {
           jwt: {
             proof_signing_alg_values_supported: ["ES256"],
+          },
+        },
+        claims: {
+          event_name: {
+            display: [{ name: "Event Name", locale: "en" }],
+          },
+          event_date: {
+            display: [{ name: "Event Date", locale: "en" }],
+          },
+          attendee_name: {
+            display: [{ name: "Attendee Name", locale: "en" }],
+          },
+          location: {
+            display: [{ name: "Location", locale: "en" }],
           },
         },
         display: [
@@ -38,23 +53,6 @@ export async function GET() {
             text_color: "#f0a500",
           },
         ],
-        credential_definition: {
-          type: ["VerifiableCredential", "EventAttendanceCredential"],
-          credentialSubject: {
-            event_name: {
-              display: [{ name: "Event Name", locale: "en" }],
-            },
-            event_date: {
-              display: [{ name: "Event Date", locale: "en" }],
-            },
-            attendee_name: {
-              display: [{ name: "Attendee Name", locale: "en" }],
-            },
-            location: {
-              display: [{ name: "Location", locale: "en" }],
-            },
-          },
-        },
       },
     },
   };

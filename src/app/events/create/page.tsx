@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
 import type { FormEvent } from "react";
@@ -12,6 +12,13 @@ interface EventFormData {
   description: string;
 }
 
+const DEFAULT_EVENT: EventFormData = {
+  name: "Amsterdam Blockchain Summit 2026",
+  date: "2026-06-15",
+  location: "Amsterdam, Netherlands",
+  description: "Annual blockchain and digital identity conference featuring EUDI Wallet demos and Web3 innovation.",
+};
+
 interface EventResponse {
   event_id: string;
   credential_offer_uri: string;
@@ -22,12 +29,18 @@ interface EventResponse {
 
 export default function CreateEventPage() {
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [formData, setFormData] = useState<EventFormData>({
     name: "",
     date: "",
     location: "",
     description: "",
   });
+
+  useEffect(() => {
+    setFormData(DEFAULT_EVENT);
+    setMounted(true);
+  }, []);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<EventResponse | null>(null);

@@ -233,7 +233,7 @@ export async function POST(request: NextRequest) {
     const sdJwtPayload = {
       iss: ISSUER_URL,
       iat: now,
-      vct: "EventAttendanceCredential",
+      vct: `${ISSUER_URL}/credentials/EventAttendanceCredential`,
       cnf: {
         jwk: header.jwk,
       },
