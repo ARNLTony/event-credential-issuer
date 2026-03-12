@@ -4,6 +4,7 @@ import {
   storeToken,
   getTokenTtlSeconds,
 } from "@/lib/store";
+import { addRequestLog } from "@/lib/debug-log";
 
 const PRE_AUTH_GRANT_TYPE =
   "urn:ietf:params:oauth:grant-type:pre-authorized_code";
@@ -20,6 +21,7 @@ function errorResponse(
 }
 
 export async function POST(request: NextRequest) {
+  await addRequestLog("POST", "/api/token", request.headers.get("user-agent") || "");
   // OID4VCI token requests use application/x-www-form-urlencoded
   let body: URLSearchParams;
   try {

@@ -105,10 +105,10 @@ export async function POST(request: NextRequest) {
   }
 
   // --- Validate format and credential_identifier ----------------------------
-  if (body.format !== "vc+sd-jwt") {
+  if (body.format !== "dc+sd-jwt" && body.format !== "vc+sd-jwt") {
     return errorResponse(
       "unsupported_credential_format",
-      'Only format "vc+sd-jwt" is supported.',
+      'Only format "dc+sd-jwt" is supported.',
       400
     );
   }
@@ -233,7 +233,7 @@ export async function POST(request: NextRequest) {
     const sdJwtPayload = {
       iss: ISSUER_URL,
       iat: now,
-      vct: `${ISSUER_URL}/credentials/EventAttendanceCredential`,
+      vct: "urn:credential:event-attendance:1",
       cnf: {
         jwk: header.jwk,
       },
@@ -245,7 +245,7 @@ export async function POST(request: NextRequest) {
     const issuerJwt = await new SignJWT(sdJwtPayload)
       .setProtectedHeader({
         alg: "ES256",
-        typ: "vc+sd-jwt",
+        typ: "dc+sd-jwt",
         kid: privateJwk.kid,
       })
       .sign(signingKey);
@@ -259,7 +259,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         credential: sdJwt,
-        format: "vc+sd-jwt",
+        format: "dc+sd-jwt",
         c_nonce: newNonce,
         c_nonce_expires_in: 300,
       },

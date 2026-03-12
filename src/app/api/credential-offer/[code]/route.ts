@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPreAuthorizedCodeData } from "@/lib/store";
+import { addRequestLog } from "@/lib/debug-log";
 
 // ---------------------------------------------------------------------------
 // GET /api/credential-offer/:code
@@ -16,6 +17,7 @@ export async function GET(
   { params }: { params: Promise<{ code: string }> }
 ) {
   const { code } = await params;
+  await addRequestLog("GET", `/api/credential-offer/${code}`, _request.headers.get("user-agent") || "");
 
   if (!code) {
     return NextResponse.json(

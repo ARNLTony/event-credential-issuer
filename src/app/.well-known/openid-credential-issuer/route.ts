@@ -1,26 +1,28 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { addRequestLog } from "@/lib/debug-log";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  await addRequestLog("GET", "/.well-known/openid-credential-issuer", request.headers.get("user-agent") || "");
   const issuerUrl =
     process.env.NEXT_PUBLIC_ISSUER_URL ?? "http://localhost:3000";
 
   const metadata = {
     credential_issuer: issuerUrl,
-    authorization_servers: [issuerUrl],
     credential_endpoint: `${issuerUrl}/api/credential`,
-    token_endpoint: `${issuerUrl}/api/token`,
-    jwks_uri: `${issuerUrl}/.well-known/jwks.json`,
-    credential_offer_endpoint: `${issuerUrl}/api/credential-offer`,
     display: [
       {
-        name: "EUDI Event Attendance Credential Issuer",
+        name: "Event Credential Issuer",
         locale: "en",
+        logo: {
+          uri: `${issuerUrl}/logo.svg`,
+          alt_text: "Event Credential Issuer logo",
+        },
       },
     ],
     credential_configurations_supported: {
       EventAttendanceCredential: {
-        format: "vc+sd-jwt",
-        vct: `${issuerUrl}/credentials/EventAttendanceCredential`,
+        format: "dc+sd-jwt",
+        vct: "urn:credential:event-attendance:1",
         scope: "EventAttendanceCredential",
         cryptographic_binding_methods_supported: ["jwk"],
         credential_signing_alg_values_supported: ["ES256"],
@@ -29,30 +31,40 @@ export async function GET() {
             proof_signing_alg_values_supported: ["ES256"],
           },
         },
-        claims: {
-          event_name: {
-            display: [{ name: "Event Name", locale: "en" }],
-          },
-          event_date: {
-            display: [{ name: "Event Date", locale: "en" }],
-          },
-          attendee_name: {
-            display: [{ name: "Attendee Name", locale: "en" }],
-          },
-          location: {
-            display: [{ name: "Location", locale: "en" }],
-          },
+        credential_metadata: {
+          claims: [
+            {
+              path: ["event_name"],
+              display: [{ name: "Event Name", locale: "en" }],
+              value_type: "string",
+            },
+            {
+              path: ["event_date"],
+              display: [{ name: "Event Date", locale: "en" }],
+              value_type: "string",
+            },
+            {
+              path: ["attendee_name"],
+              display: [{ name: "Attendee Name", locale: "en" }],
+              value_type: "string",
+            },
+            {
+              path: ["location"],
+              display: [{ name: "Location", locale: "en" }],
+              value_type: "string",
+            },
+          ],
+          display: [
+            {
+              name: "Event Attendance",
+              description:
+                "A verifiable credential proving attendance at an event.",
+              locale: "en",
+              background_color: "#1a1a2e",
+              text_color: "#f0a500",
+            },
+          ],
         },
-        display: [
-          {
-            name: "Event Attendance",
-            description:
-              "A verifiable credential proving attendance at an event.",
-            locale: "en",
-            background_color: "#1a1a2e",
-            text_color: "#f0a500",
-          },
-        ],
       },
     },
   };
