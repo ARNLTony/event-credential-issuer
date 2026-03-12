@@ -25,6 +25,12 @@ export interface TokenEntry {
   expiresAt: number;
 }
 
+interface NonceEntry {
+  nonce: string;
+  createdAt: number;
+  consumed: boolean;
+}
+
 // ---------------------------------------------------------------------------
 // In-memory stores
 // ---------------------------------------------------------------------------
@@ -34,6 +40,9 @@ const preAuthorizedCodes = new Map<string, PreAuthorizedCodeEntry>();
 
 /** Maps access_token -> entry */
 const accessTokens = new Map<string, TokenEntry>();
+
+/** Maps c_nonce -> entry */
+const nonces = new Map<string, NonceEntry>();
 
 // ---------------------------------------------------------------------------
 // Pre-authorized code helpers
@@ -86,9 +95,13 @@ const TOKEN_TTL_S = 86_400; // 24 hours
 
 /**
  * Generate and store an access token associated with event data.
- * Returns the opaque token string.
+ * Also creates and returns a c_nonce for proof-of-possession.
+ * Returns an object with the token and the nonce.
  */
-export function storeToken(eventData: EventData): string {
+export function storeToken(eventData: EventData): {
+  token: string;
+  cNonce: string;
+} {
   const token = randomBytes(32).toString("hex");
   const now = Date.now();
 
@@ -99,7 +112,9 @@ export function storeToken(eventData: EventData): string {
     expiresAt: now + TOKEN_TTL_S * 1000,
   });
 
-  return token;
+  const cNonce = storeNonce();
+
+  return { token, cNonce };
 }
 
 /**
@@ -121,4 +136,43 @@ export function validateToken(token: string): EventData | null {
  */
 export function getTokenTtlSeconds(): number {
   return TOKEN_TTL_S;
+}
+
+// ---------------------------------------------------------------------------
+// Nonce helpers (c_nonce for proof-of-possession)
+// ---------------------------------------------------------------------------
+
+const NONCE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
+/**
+ * Create and store a cryptographically random nonce with a 5-minute TTL.
+ * Returns the nonce string.
+ */
+export function storeNonce(): string {
+  const nonce = randomBytes(16).toString("base64url");
+
+  nonces.set(nonce, {
+    nonce,
+    createdAt: Date.now(),
+    consumed: false,
+  });
+
+  return nonce;
+}
+
+/**
+ * Validate and consume a c_nonce. Returns true if the nonce was valid
+ * and has been consumed, false otherwise (unknown, expired, or already used).
+ */
+export function consumeNonce(nonce: string): boolean {
+  const entry = nonces.get(nonce);
+  if (!entry) return false;
+  if (entry.consumed) return false;
+  if (Date.now() - entry.createdAt > NONCE_TTL_MS) {
+    nonces.delete(nonce);
+    return false;
+  }
+
+  entry.consumed = true;
+  return true;
 }

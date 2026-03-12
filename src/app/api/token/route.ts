@@ -70,14 +70,14 @@ export async function POST(request: NextRequest) {
   }
 
   // --- Issue access token ----------------------------------------------------
-  const accessToken = storeToken(eventData);
+  const { token: accessToken, cNonce } = storeToken(eventData);
 
   return NextResponse.json(
     {
       access_token: accessToken,
       token_type: "bearer",
       expires_in: getTokenTtlSeconds(),
-      c_nonce: crypto.randomUUID(),
+      c_nonce: cNonce,
       c_nonce_expires_in: 300,
     },
     {
