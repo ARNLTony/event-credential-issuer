@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const eventData = consumePreAuthorizedCode(preAuthorizedCode);
+  const eventData = await consumePreAuthorizedCode(preAuthorizedCode);
   if (!eventData) {
     return errorResponse(
       "invalid_grant",
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
   }
 
   // --- Issue access token ----------------------------------------------------
-  const { token: accessToken, cNonce } = storeToken(eventData);
+  const { token: accessToken, cNonce } = await storeToken(eventData);
 
   return NextResponse.json(
     {

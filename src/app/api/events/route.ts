@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
   }
 
   // --- Create pre-authorized code -------------------------------------------
-  const preAuthorizedCode = createPreAuthorizedCode({
+  const preAuthorizedCode = await createPreAuthorizedCode({
     event_name,
     event_date,
     attendee_name: attendee_name ?? "Attendee",
@@ -60,13 +60,14 @@ export async function POST(request: NextRequest) {
     },
   };
 
-  // Build the openid-credential-offer:// deep link URI (for direct wallet opening)
-  const credentialOfferUri =
-    "openid-credential-offer://?credential_offer=" +
-    encodeURIComponent(JSON.stringify(credentialOffer));
-
-  // Build the HTTPS credential offer URL (shorter, better for QR codes)
+  // HTTPS URL where wallets can fetch the credential offer JSON
   const credentialOfferUrl = `${ISSUER_URL}/api/credential-offer/${preAuthorizedCode}`;
+
+  // Deep link URI using credential_offer_uri (by-reference) — wallet fetches the offer from the URL
+  // This is shorter and more compatible than embedding the full offer inline
+  const credentialOfferUri =
+    "openid-credential-offer://?credential_offer_uri=" +
+    encodeURIComponent(credentialOfferUrl);
 
   // Generate a simple event ID for reference
   const eventId = crypto.randomUUID();

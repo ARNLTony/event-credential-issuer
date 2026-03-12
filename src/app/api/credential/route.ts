@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
   }
 
   const accessToken = authHeader.slice("Bearer ".length).trim();
-  const eventData = validateToken(accessToken);
+  const eventData = await validateToken(accessToken);
   if (!eventData) {
     return errorResponse(
       "invalid_token",
@@ -194,7 +194,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Validate and consume the c_nonce
-  if (!proofPayload.nonce || !consumeNonce(proofPayload.nonce)) {
+  if (!proofPayload.nonce || !(await consumeNonce(proofPayload.nonce))) {
     return errorResponse(
       "invalid_nonce",
       "The c_nonce in the proof JWT is missing, invalid, expired, or already used.",
@@ -254,7 +254,7 @@ export async function POST(request: NextRequest) {
     const sdJwt = issuerJwt + "~" + disclosures.join("~") + "~";
 
     // Issue a fresh c_nonce for subsequent requests
-    const newNonce = storeNonce();
+    const newNonce = await storeNonce();
 
     return NextResponse.json(
       {

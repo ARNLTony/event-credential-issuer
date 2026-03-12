@@ -24,7 +24,7 @@ export async function GET(
     );
   }
 
-  const eventData = getPreAuthorizedCodeData(code);
+  const eventData = await getPreAuthorizedCodeData(code);
   if (!eventData) {
     return NextResponse.json(
       {

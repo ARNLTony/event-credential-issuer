@@ -6,7 +6,7 @@ import { createPreAuthorizedCode } from "@/lib/store";
  * This will be replaced by the real event creation flow in Day 2.
  */
 export async function POST() {
-  const code = createPreAuthorizedCode({
+  const code = await createPreAuthorizedCode({
     event_name: "Amsterdam Blockchain Summit 2026",
     event_date: "2026-06-15",
     attendee_name: "Test Attendee",
