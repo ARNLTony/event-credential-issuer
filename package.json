@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "generate-keys": "npx tsx scripts/generate-keys.ts"
   },
   "dependencies": {
     "jose": "^6.2.1",
