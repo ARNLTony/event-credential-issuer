@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Image from "next/image";
 import Link from "next/link";
 import "./globals.css";
 
@@ -32,6 +33,13 @@ export default function RootLayout({
         <header className="border-b border-white/10">
           <nav className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
             <Link href="/" className="flex items-center gap-2">
+              <Image
+                src="/logo.svg"
+                alt="Event Credential Issuer logo"
+                width={32}
+                height={32}
+                className="h-8 w-8"
+              />
               <span className="text-accent text-xl font-bold tracking-tight">
                 ECI
               </span>

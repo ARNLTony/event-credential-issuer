@@ -9,6 +9,8 @@ export async function GET() {
     authorization_servers: [issuerUrl],
     credential_endpoint: `${issuerUrl}/api/credential`,
     token_endpoint: `${issuerUrl}/api/token`,
+    jwks_uri: `${issuerUrl}/.well-known/jwks.json`,
+    credential_offer_endpoint: `${issuerUrl}/api/credential-offer`,
     display: [
       {
         name: "EUDI Event Attendance Credential Issuer",

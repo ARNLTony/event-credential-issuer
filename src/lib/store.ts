@@ -87,6 +87,21 @@ export function consumePreAuthorizedCode(
   return entry.eventData;
 }
 
+/**
+ * Look up a pre-authorized code and return its event data without consuming it.
+ * Returns null if the code is unknown, expired, or already consumed.
+ */
+export function getPreAuthorizedCodeData(code: string): EventData | null {
+  const entry = preAuthorizedCodes.get(code);
+  if (!entry) return null;
+  if (entry.consumed) return null;
+  if (Date.now() - entry.createdAt > CODE_TTL_MS) {
+    preAuthorizedCodes.delete(code);
+    return null;
+  }
+  return entry.eventData;
+}
+
 // ---------------------------------------------------------------------------
 // Access token helpers
 // ---------------------------------------------------------------------------

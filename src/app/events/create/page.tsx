@@ -15,6 +15,7 @@ interface EventFormData {
 interface EventResponse {
   event_id: string;
   credential_offer_uri: string;
+  credential_offer_url: string;
   pre_authorized_code: string;
   credential_offer: Record<string, unknown>;
 }
@@ -105,6 +106,7 @@ export default function CreateEventPage() {
       location: formData.location,
       description: formData.description,
       offer_uri: result.credential_offer_uri,
+      offer_url: result.credential_offer_url,
     });
     router.push(`/events/${result.event_id}?${params.toString()}`);
   }
@@ -112,7 +114,7 @@ export default function CreateEventPage() {
   // Success state — show QR code and credential offer
   if (result) {
     return (
-      <div className="mx-auto flex max-w-lg flex-col items-center px-6 py-16 text-center">
+      <div className="mx-auto flex max-w-lg flex-col items-center px-6 py-12 text-center">
         {/* Success icon */}
         <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-accent/15">
           <svg
@@ -138,90 +140,78 @@ export default function CreateEventPage() {
           created successfully.
         </p>
 
-        {/* QR Code */}
-        <div className="mt-8 rounded-2xl border border-white/10 bg-surface p-6">
-          <div className="rounded-xl bg-white p-4">
-            <QRCodeSVG
-              value={result.credential_offer_uri}
-              size={256}
-              level="M"
-              marginSize={0}
-              aria-label={`QR code for credential offer: ${formData.name}`}
-            />
+        {/* QR Code — uses HTTPS URL for better compatibility */}
+        <div className="mt-8 w-full max-w-sm rounded-2xl border border-white/10 bg-surface p-6 sm:p-8">
+          <div className="flex justify-center">
+            <div className="rounded-xl bg-white p-5">
+              <QRCodeSVG
+                value={result.credential_offer_url}
+                size={320}
+                level="M"
+                marginSize={0}
+                aria-label={`QR code for credential offer: ${formData.name}`}
+              />
+            </div>
           </div>
-          <p className="mt-4 text-sm text-muted">
-            Scan with a EUDI Wallet to receive your credential
-          </p>
+
+          {/* Step-by-step instructions */}
+          <div className="mt-6 rounded-lg border border-accent/20 bg-accent/5 px-4 py-4">
+            <p className="mb-3 text-sm font-semibold text-accent">How to claim your credential</p>
+            <ol className="space-y-2 text-left text-sm text-muted">
+              <li className="flex items-start gap-2">
+                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent/20 text-xs font-bold text-accent">1</span>
+                <span>Open your EUDI Wallet app</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent/20 text-xs font-bold text-accent">2</span>
+                <span>Scan this QR code</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent/20 text-xs font-bold text-accent">3</span>
+                <span>Accept the credential</span>
+              </li>
+            </ol>
+          </div>
         </div>
 
-        {/* Credential offer URI */}
-        <div className="mt-6 w-full rounded-xl border border-white/10 bg-surface p-4">
-          <p className="mb-2 text-xs font-medium uppercase tracking-wider text-muted">
-            Credential Offer URI
-          </p>
-          <a
-            href={result.credential_offer_uri}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block break-all text-sm text-accent underline decoration-accent/30 underline-offset-2 transition-colors hover:decoration-accent"
-          >
-            {result.credential_offer_uri}
-          </a>
+        {/* URLs section */}
+        <div className="mt-6 w-full space-y-3">
+          {/* Primary: HTTPS URL */}
+          <div className="rounded-xl border border-white/10 bg-surface p-4">
+            <p className="mb-2 text-xs font-medium uppercase tracking-wider text-muted">
+              Credential Offer URL (HTTPS)
+            </p>
+            <a
+              href={result.credential_offer_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block break-all text-sm text-accent underline decoration-accent/30 underline-offset-2 transition-colors hover:decoration-accent"
+            >
+              {result.credential_offer_url}
+            </a>
+          </div>
+
+          {/* Secondary: Deep link URI */}
+          <div className="rounded-xl border border-white/10 bg-surface p-4">
+            <p className="mb-2 text-xs font-medium uppercase tracking-wider text-muted">
+              Deep Link URI (for wallets)
+            </p>
+            <p className="break-all text-xs text-muted/70 font-mono leading-relaxed">
+              {result.credential_offer_uri}
+            </p>
+          </div>
         </div>
 
         {/* Action buttons */}
-        <div className="mt-8 flex w-full flex-col gap-3 sm:flex-row">
-          <button
-            onClick={copyToClipboard}
-            className="flex h-11 flex-1 items-center justify-center gap-2 rounded-lg bg-accent px-6 text-sm font-semibold text-[#1a1a2e] transition-all hover:brightness-110"
-            aria-label="Copy credential offer link to clipboard"
-          >
-            {copied ? (
-              <>
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2.5}
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-                Copied!
-              </>
-            ) : (
-              <>
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                  />
-                </svg>
-                Copy Link
-              </>
-            )}
-          </button>
-
-          <button
-            onClick={handleViewSharePage}
-            className="flex h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-white/15 px-6 text-sm font-medium transition-colors hover:border-white/30 hover:bg-white/5"
-            aria-label="View shareable event page"
+        <div className="mt-8 flex w-full flex-col gap-3">
+          {/* Open in Wallet — deep link for mobile users */}
+          <a
+            href={result.credential_offer_uri}
+            className="flex h-12 items-center justify-center gap-2 rounded-lg bg-accent px-6 text-sm font-semibold text-[#1a1a2e] transition-all hover:brightness-110"
+            aria-label="Open credential offer in EUDI Wallet"
           >
             <svg
-              className="h-4 w-4"
+              className="h-5 w-5"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -231,11 +221,79 @@ export default function CreateEventPage() {
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
               />
             </svg>
-            Share Page
-          </button>
+            Open in Wallet
+          </a>
+
+          <div className="flex w-full flex-col gap-3 sm:flex-row">
+            <button
+              onClick={copyToClipboard}
+              className="flex h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-white/15 px-6 text-sm font-medium transition-colors hover:border-white/30 hover:bg-white/5"
+              aria-label="Copy credential offer link to clipboard"
+            >
+              {copied ? (
+                <>
+                  <svg
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2.5}
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                  Copied!
+                </>
+              ) : (
+                <>
+                  <svg
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                    />
+                  </svg>
+                  Copy Link
+                </>
+              )}
+            </button>
+
+            <button
+              onClick={handleViewSharePage}
+              className="flex h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-white/15 px-6 text-sm font-medium transition-colors hover:border-white/30 hover:bg-white/5"
+              aria-label="View shareable event page"
+            >
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                />
+              </svg>
+              Share Page
+            </button>
+          </div>
         </div>
 
         <button

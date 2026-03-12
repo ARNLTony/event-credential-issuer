@@ -60,10 +60,13 @@ export async function POST(request: NextRequest) {
     },
   };
 
-  // Build the openid-credential-offer:// URI
+  // Build the openid-credential-offer:// deep link URI (for direct wallet opening)
   const credentialOfferUri =
     "openid-credential-offer://?credential_offer=" +
     encodeURIComponent(JSON.stringify(credentialOffer));
+
+  // Build the HTTPS credential offer URL (shorter, better for QR codes)
+  const credentialOfferUrl = `${ISSUER_URL}/api/credential-offer/${preAuthorizedCode}`;
 
   // Generate a simple event ID for reference
   const eventId = crypto.randomUUID();
@@ -72,6 +75,7 @@ export async function POST(request: NextRequest) {
     {
       event_id: eventId,
       credential_offer_uri: credentialOfferUri,
+      credential_offer_url: credentialOfferUrl,
       pre_authorized_code: preAuthorizedCode,
       credential_offer: credentialOffer,
       event: {

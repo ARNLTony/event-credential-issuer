@@ -90,6 +90,74 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Powered by */}
+      <section className="mx-auto w-full max-w-5xl px-6 py-16">
+        <div className="mb-10 text-center">
+          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            Powered By
+          </h2>
+          <p className="mt-3 text-muted">
+            Built on open standards for interoperability and trust.
+          </p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            {
+              title: "SD-JWT VC",
+              description:
+                "Selective Disclosure JSON Web Token Verifiable Credentials for privacy-preserving attestations.",
+            },
+            {
+              title: "OID4VCI",
+              description:
+                "OpenID for Verifiable Credential Issuance protocol for standardized credential delivery.",
+            },
+            {
+              title: "eIDAS 2.0",
+              description:
+                "Compatible with the European Digital Identity framework and regulation.",
+            },
+          ].map((tech) => (
+            <div
+              key={tech.title}
+              className="rounded-xl border border-white/10 bg-surface p-5 transition-colors hover:border-accent/20"
+            >
+              <p className="mb-2 text-sm font-bold text-accent">{tech.title}</p>
+              <p className="text-sm leading-relaxed text-muted">
+                {tech.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Compatible Wallets */}
+      <section className="mx-auto w-full max-w-5xl px-6 pb-20">
+        <div className="mb-10 text-center">
+          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            Compatible Wallets
+          </h2>
+          <p className="mt-3 text-muted">
+            Works with leading EUDI Wallet implementations.
+          </p>
+        </div>
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          {[
+            "EU Reference Wallet",
+            "Lissi",
+            "FortID",
+            "TICE",
+          ].map((wallet) => (
+            <div
+              key={wallet}
+              className="flex items-center justify-center rounded-xl border border-white/10 bg-surface px-4 py-5 text-center text-sm font-semibold text-foreground transition-colors hover:border-accent/30 hover:bg-surface-light"
+            >
+              {wallet}
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="mt-auto border-t border-white/10 py-8 text-center text-sm text-muted">
         <p>
