@@ -145,7 +145,7 @@ export default function CreateEventPage() {
           <div className="flex justify-center">
             <div className="rounded-xl bg-white p-5">
               <QRCodeSVG
-                value={result.credential_offer_url}
+                value={result.credential_offer_uri}
                 size={320}
                 level="M"
                 marginSize={0}

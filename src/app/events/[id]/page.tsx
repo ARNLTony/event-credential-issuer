@@ -16,8 +16,8 @@ export default function EventDetailPage() {
   const offerUri = searchParams.get("offer_uri");
   const offerUrl = searchParams.get("offer_url");
 
-  // Use HTTPS URL for QR (more compatible), fall back to deep link URI
-  const qrValue = offerUrl || offerUri;
+  // Use deep link URI for QR so wallets can intercept it when scanning
+  const qrValue = offerUri;
 
   async function copyToClipboard() {
     const valueToCopy = offerUrl || offerUri;
